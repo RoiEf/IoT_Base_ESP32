@@ -14,6 +14,7 @@
 #include <dwd.hpp>
 
 // Self created includes
+#include <IoT_Base_Handlers.h>
 #include <IoT_Base_defaults.h>
 #include <IoT_Types.h>
 
@@ -61,8 +62,8 @@ void hard_restart(void);
 int scanWifi(String *str);
 void connTreadFunc(void *pvParameters);
 
-size_t content_len;
-void handleDoUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final);
+// size_t content_len;
+// void handleDoUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final);
 
 void setup() {
     String str;
@@ -161,8 +162,11 @@ void setup() {
     }
     SPIFFS.begin();
 
-    // server.on("/", handleRoot);
-    // server.on("/GenNet", handleNET);
+    server.on("/", handleRoot);
+    server.addHandler(loginHandler);
+    server.addHandler(adminHandler);
+    server.addHandler(scanWifiHandler);
+    server.addHandler(wifiHandler);
     // server.on("/AP", handleAP);
     // server.on("/STA", handleSTA);
     // server.on("/ModFeat", HTTP_POST, handleModFeat);
@@ -173,12 +177,12 @@ void setup() {
     });
 
     server.on(
-        "/doUpdate", HTTP_POST,
+        "/updates/firmware", HTTP_POST,
         [](AsyncWebServerRequest *request) {},
         [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
            size_t len, bool final) { handleDoUpdate(request, filename, index, data, len, final); });
 
-    // server.onNotFound(handleRoot);
+    server.onNotFound(handleRoot);
 
     server.begin();
     Serial.println("HTTP server started");
@@ -261,36 +265,36 @@ void hard_restart(void) {
         ;
 }
 
-void handleDoUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
-    int cmd = U_FLASH;
+// void handleDoUpdate(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
+// int cmd = U_FLASH;
 
-    if (!index) {
-        Serial.println("Update");
-        content_len = request->contentLength();
+// if (!index) {
+//     Serial.println("Update");
+//     content_len = request->contentLength();
 
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-            Update.printError(Serial);
-        }
-    }
+//     if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
+//         Update.printError(Serial);
+//     }
+// }
 
-    if (Update.write(data, len) != len) {
-        Update.printError(Serial);
-    }
+// if (Update.write(data, len) != len) {
+//     Update.printError(Serial);
+// }
 
-    if (final) {
-        AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the device reboots");
-        response->addHeader("Refresh", "20");
-        response->addHeader("Location", "/");
-        request->send(response);
-        if (!Update.end(true)) {
-            Update.printError(Serial);
-        } else {
-            Serial.println("Update complete");
-            Serial.flush();
-            ESP.restart();
-        }
-    }
-}
+// if (final) {
+//     AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the device reboots");
+//     response->addHeader("Refresh", "20");
+//     response->addHeader("Location", "/");
+//     request->send(response);
+//     if (!Update.end(true)) {
+//         Update.printError(Serial);
+//     } else {
+//         Serial.println("Update complete");
+//         Serial.flush();
+//         ESP.restart();
+//     }
+// }
+// }
 
 int scanWifi(String *str) {
     Serial.println("scan start");
