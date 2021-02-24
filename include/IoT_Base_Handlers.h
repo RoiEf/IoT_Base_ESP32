@@ -48,6 +48,9 @@ AsyncCallbackJsonWebHandler *adminHandler = new AsyncCallbackJsonWebHandler("/up
             const char *buff = data["password1"];
             NVS.begin(NVS_STRING, false);
             NVS.putString("webPassword", buff);
+            if (NVS.getBool("justReset", true))
+                NVS.putBool("justReset", false);
+
             NVS.end();
             webPassword = buff;
             Serial.print("response from /updates/password: ");

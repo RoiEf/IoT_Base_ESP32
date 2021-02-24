@@ -86,6 +86,11 @@ void setup() {
     NVS.begin(NVS_STRING, false);
     justReset = NVS.getBool("justReset", true);
 
+    Serial.print("justReset: ");
+    Serial.println(justReset);
+    Serial.print("mode: ");
+    Serial.println(mode);
+
     if (mode == RESET && !justReset) {
         NVS.clear();
         justReset = true;
@@ -98,8 +103,28 @@ void setup() {
         mode = (MODE)NVS.getUChar("mode", MODE::AP);
         webPassword = NVS.getString("webPassword", "12345");
 
+        Serial.print("webPassword: ");
+        Serial.println(webPassword);
+
         if (mode == AP) {
-            local_ip = NVS.getUInt("AP_local_ip", 3232235777);  //  192.168.1.1
+            Serial.println("AP_local_ip: ");
+            Serial.println(local_ip);
+            IP_CONVERT temp;
+            temp.d_ip = NVS.getUInt("AP_local_ip", 3232235777);  //  192.168.1.1
+            Serial.println("temp.d_ip: ");
+            Serial.println(temp.d_ip);
+
+            Serial.println("temp.1: ");
+            Serial.println(temp.octecs[0]);
+            Serial.println("temp.2: ");
+            Serial.println(temp.octecs[1]);
+            Serial.println("temp.3: ");
+            Serial.println(temp.octecs[2]);
+            Serial.println("temp.4: ");
+            Serial.println(temp.octecs[3]);
+
+            local_ip[0] = 192;
+
             gateway = local_ip;
             Serial.println("AP_local_ip: ");
             Serial.println(local_ip);
@@ -245,7 +270,10 @@ void toReset(void) {
                 ledStat = HIGH;
             digitalWrite(STATUS_LED, ledStat);
         }
-        if (!digitalRead(RESET_PIN))
+        bool dbuge = digitalRead(RESET_PIN);
+        Serial.print("dbuge: ");
+        Serial.println(dbuge);
+        if (!dbuge)
             return;
         delay(5);
     }
