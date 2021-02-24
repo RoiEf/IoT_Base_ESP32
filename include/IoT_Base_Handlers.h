@@ -2,13 +2,16 @@
 
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
-#include <Update.h>  // OTA Update
+#include <IoT_Base_defaults.h>
+#include <Preferences.h>  // flash memory
+#include <Update.h>       // OTA Update
 #include <html.h>
 
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 
 extern String webPassword;
+extern Preferences NVS;
 
 void handleRoot(AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", htmlData);
@@ -40,10 +43,24 @@ AsyncCallbackJsonWebHandler *adminHandler = new AsyncCallbackJsonWebHandler("/up
     } else if (json.is<JsonObject>()) {
         data = json.as<JsonObject>();
     }
-    String response;
-    serializeJson(data, response);
-    request->send(200, "application/json", response);
-    Serial.println(response);
+    if (data["userName"] == "admin" && data["password"] == webPassword) {
+        if (data["password1"] == data["password2"]) {
+            const char *buff = data["password1"];
+            NVS.begin(NVS_STRING, false);
+            NVS.putString("webPassword", buff);
+            NVS.end();
+            webPassword = buff;
+            Serial.print("response from /updates/password: ");
+            Serial.println(buff);
+
+            request->send(200, "application/json", "{\"message\": \"Password Update sucess\"}");
+        } else {
+            request->send(200, "application/json", "{\"message\": \"Password Update Faild\"}");
+        }
+
+    } else {
+        request->send(401, "application/json", "{\"message\": \"Auth Faild\"}");
+    }
 });
 
 AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wifi", [](AsyncWebServerRequest *request, JsonVariant &json) {
