@@ -8,6 +8,8 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 
+extern String webPassword;
+
 void handleRoot(AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", htmlData);
 }
@@ -20,8 +22,14 @@ AsyncCallbackJsonWebHandler *loginHandler = new AsyncCallbackJsonWebHandler("/lo
         data = json.as<JsonObject>();
     }
     String response;
-    serializeJson(data, response);
+    if (data["userName"] == "admin" && data["password"] == webPassword) {
+        response = "{\"message\": \"Auth sucess\"}";
+    } else {
+        response = "{\"message\": \"Auth Faild\"}";
+    }
+
     request->send(200, "application/json", response);
+    Serial.print("response from /login: ");
     Serial.println(response);
 });
 
