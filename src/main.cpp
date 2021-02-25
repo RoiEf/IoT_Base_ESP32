@@ -107,29 +107,44 @@ void setup() {
         Serial.println(webPassword);
 
         if (mode == AP) {
-            Serial.println("AP_local_ip: ");
-            Serial.println(local_ip);
-            IP_CONVERT temp;
-            temp.d_ip = NVS.getUInt("AP_local_ip", 3232235777);  //  192.168.1.1
-            Serial.println("temp.d_ip: ");
-            Serial.println(temp.d_ip);
+            // Serial.println("AP_local_ip: ");
+            // Serial.println(local_ip);
+            ip_convert temp;
+            temp.ip.decimal = NVS.getUInt("AP_local_ip", 3232235777);  //  192.168.1.1
+            // Serial.println("temp.decimal: ");
+            // Serial.println(temp.ip.decimal);
 
-            Serial.println("temp.1: ");
-            Serial.println(temp.octecs[0]);
-            Serial.println("temp.2: ");
-            Serial.println(temp.octecs[1]);
-            Serial.println("temp.3: ");
-            Serial.println(temp.octecs[2]);
-            Serial.println("temp.4: ");
-            Serial.println(temp.octecs[3]);
+            // Serial.println("temp.1: ");
+            // Serial.println(temp.ip.octecs[0]);
+            // Serial.println("temp.2: ");
+            // Serial.println(temp.ip.octecs[1]);
+            // Serial.println("temp.3: ");
+            // Serial.println(temp.ip.octecs[2]);
+            // Serial.println("temp.4: ");
+            // Serial.println(temp.ip.octecs[3]);
 
-            local_ip[0] = 192;
+            temp.reverse();
+
+            // Serial.println("temp.decimal: ");
+            // Serial.println(temp.ip.decimal);
+            // Serial.println("temp.1: ");
+            // Serial.println(temp.ip.octecs[0]);
+            // Serial.println("temp.2: ");
+            // Serial.println(temp.ip.octecs[1]);
+            // Serial.println("temp.3: ");
+            // Serial.println(temp.ip.octecs[2]);
+            // Serial.println("temp.4: ");
+            // Serial.println(temp.ip.octecs[3]);
+
+            local_ip = temp.ip.octecs;
 
             gateway = local_ip;
             Serial.println("AP_local_ip: ");
             Serial.println(local_ip);
 
-            subnet = NVS.getUInt("AP_subnet", 4294967040);  //  255.255.255.0
+            temp.ip.decimal = NVS.getUInt("AP_subnet", 4294967040);  //  255.255.255.0
+            temp.reverse();
+            subnet = temp.ip.octecs;
 
             memset(wifi_ssid, '\0', 32);
             memset(wifi_password, '\0', 63);
@@ -192,11 +207,6 @@ void setup() {
     server.addHandler(adminHandler);
     server.addHandler(scanWifiHandler);
     server.addHandler(wifiHandler);
-    // server.on("/AP", handleAP);
-    // server.on("/STA", handleSTA);
-    // server.on("/ModFeat", HTTP_POST, handleModFeat);
-    // if (runAPIFlag) server.on("/API", handleAPI);
-    //     if (runSenderFlag) ; // run sender thread
     server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/favicon.ico", "image/x-icon");
     });
