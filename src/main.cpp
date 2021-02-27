@@ -27,7 +27,7 @@ MODE mode = AP;
 bool justReset = true;
 bool STA_Static = false;
 
-TIMER timer(1000);
+TIMER timer(5000);
 int loopI = 0;
 
 Preferences NVS;
@@ -280,10 +280,7 @@ void toReset(void) {
                 ledStat = HIGH;
             digitalWrite(STATUS_LED, ledStat);
         }
-        bool dbuge = digitalRead(RESET_PIN);
-        Serial.print("dbuge: ");
-        Serial.println(dbuge);
-        if (!dbuge)
+        if (!digitalRead(RESET_PIN))
             return;
         delay(5);
     }
