@@ -235,7 +235,7 @@ void setup() {
     }
 
     // Start any sensor
-
+    sensors1.begin();
     delay(2000);
 }
 

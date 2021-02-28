@@ -27,7 +27,7 @@ void tempratureHandler(AsyncWebServerRequest *request) {
 
     sensors1.requestTemperatures();
     currentTemp = sensors1.getTempCByIndex(0);
-    currentTemp = round(currentTemp * 10.0) / 10.0;
+    // currentTemp = round(currentTemp * 10.0) / 10.0;
     response += currentTemp;
     response += "}";
     Serial.println("/temprature");
