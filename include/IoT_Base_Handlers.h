@@ -233,23 +233,27 @@ AsyncCallbackJsonWebHandler *scanWifiHandler = new AsyncCallbackJsonWebHandler("
         int n = WiFi.scanNetworks();
         Serial.println("scan done");
         if (n == 0) {
+            sprintf(message, "no networks found");
             Serial.println("no networks found");
         } else {
+            sprintf(message, "%d Networks found", n);
             Serial.println(n);
             Serial.println(" networks found");
             for (int i = 0; i < n; ++i) {
                 // Print SSID and RSSI for each network found
-                *str += "<li><input type=\"radio\" name=\"netSelect\" id=\"\" value=\"";
-                *str += String(WiFi.SSID(i));
-                *str += "\">";
-                *str += String(WiFi.SSID(i));
-                *str += " | ";
-                *str += String(WiFi.RSSI(i));
-                *str += " | ";
-                *str += String((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "&#x26BF;");
-                *str += "</li>";
+                // *str += "<li><input type=\"radio\" name=\"netSelect\" id=\"\" value=\"";
+                // *str += String(WiFi.SSID(i));
+                // *str += "\">";
+                // *str += String(WiFi.SSID(i));
+                // *str += " | ";
+                // *str += String(WiFi.RSSI(i));
+                // *str += " | ";
+                // *str += String((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "&#x26BF;");
+                // *str += "</li>";
             }
         }
+
+        doc["message"] = message;
 
         serializeJson(doc, response);
         Serial.println(response);
