@@ -215,8 +215,8 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
 });
 
 AsyncCallbackJsonWebHandler *scanWifiHandler = new AsyncCallbackJsonWebHandler("/wifi/scan", [](AsyncWebServerRequest *request, JsonVariant &json) {
-    StaticJsonDocument<200> data;
-    StaticJsonDocument<1024> doc;
+    StaticJsonDocument<100> data;
+    // StaticJsonDocument<1024> doc;
     String response;
     char message[32] = {0};
 
@@ -230,33 +230,51 @@ AsyncCallbackJsonWebHandler *scanWifiHandler = new AsyncCallbackJsonWebHandler("
 
         // WiFi.scanNetworks will return the number of networks found
         int n = WiFi.scanNetworks();
-        if (n > 15) n = 15;
+        // if (n > 15) n = 15;
 
         Serial.println("scan done");
+        response = "{\"message\":\"";
         if (n == 0) {
             sprintf(message, "no networks found");
             Serial.println("no networks found");
+            response += message;
+            response += "\"";
+
         } else {
+            // const size_t CAPACITY = JSON_ARRAY_SIZE(15);
+            // // allocate the memory for the document
+            // StaticJsonDocument<CAPACITY> arrDoc;
+            // // create an empty array
+            // JsonArray array = arrDoc.to<JsonArray>();
+
             sprintf(message, "%d Networks found", n);
-            Serial.println(n);
+            Serial.print(n);
             Serial.println(" networks found");
+            response += message;
+            response += "\"";
+            response += ",\"networks\":[";
             for (int i = 0; i < n; ++i) {
-                // Print SSID and RSSI for each network found
-                // *str += "<li><input type=\"radio\" name=\"netSelect\" id=\"\" value=\"";
-                // *str += String(WiFi.SSID(i));
-                // *str += "\">";
-                // *str += String(WiFi.SSID(i));
-                // *str += " | ";
-                // *str += String(WiFi.RSSI(i));
-                // *str += " | ";
-                // *str += String((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "&#x26BF;");
-                // *str += "</li>";
+                response += "{";
+                response += "\"SSID\":\"";
+                response += String(WiFi.SSID(i));
+                response += "\",\"auth\":";
+                response += String((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? "false" : "true");
+                response += ",\"signal\":\"";
+                response += String(WiFi.RSSI(i));
+                response += "\"";
+                response += "},";
             }
+            int length = response.length();
+            response.remove(length - 1);
+            response += "]";
         }
+        response += "}";
 
-        doc["message"] = message;
+        // doc["message"] = message;
+        // doc["networks"] = response;
 
-        serializeJson(doc, response);
+        // serializeJson(doc, response);
+        Serial.print("/wifi/scan response: ");
         Serial.println(response);
         request->send(200, "application/json", response);
     } else {
