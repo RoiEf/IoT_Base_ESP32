@@ -92,6 +92,12 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     char SSID_IN_Client[32] = {0};
     char Auth_IN_Client[63] = {0};
 
+    bool update = false;
+    bool updateStaticIP = false;
+    bool updateDHCP = false;
+    bool updateDeviceMode = false;
+    bool updateSSIDinSTA = false;
+
     if (json.is<JsonArray>()) {
         data = json.as<JsonArray>();
     } else if (json.is<JsonObject>()) {
@@ -100,12 +106,14 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
 
     NVS.begin(NVS_STRING, false);
     if (data["cmd"] == "update") {
+        update = true;
         strlcpy(ssid, data["ssid"] | "iot_base", 32);
         strlcpy(wifiPassword, data["wifiPassword"] | "", 63);
         NVS.putString("ssid", ssid);
         NVS.putString("wifiPassword", wifiPassword);
 
     } else if (data["cmd"] == "updateDHCP") {
+        updateDHCP = true;
         if (data["dhcp"]) {
             strlcpy(dhcp, data["dhcpMode"] | "DHCP", 16);
         } else {
@@ -114,6 +122,8 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         NVS.putString("dhcpMode", dhcp);
 
     } else if (data["cmd"] == "updateStaticIP") {
+        updateStaticIP = true;
+
         NVS.putUChar("ip1", data["ip1"].as<unsigned char>());
         NVS.putUChar("ip2", data["ip2"].as<unsigned char>());
         NVS.putUChar("ip3", data["ip3"].as<unsigned char>());
@@ -140,28 +150,42 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         dg4 = data["dg4"];
 
     } else if (data["cmd"] == "updateDeviceMode") {
+        updateDeviceMode = true;
         if (data["wifiAP"]) {
-            strlcpy(device_mode, data["device_mode"] | "AP", 32);
+            strlcpy(device_mode, data["device_mode"] | "AP", 5);
         } else {
-            strlcpy(device_mode, data["device_mode"] | "STA", 32);
+            strlcpy(device_mode, data["device_mode"] | "STA", 5);
         }
         NVS.putString("device_mode", device_mode);
-        sprintf(message, "%s", "Device Mode Update sucess");
+        sprintf(message, "Device Mode Update sucess");
 
     } else if (data["cmd"] == "updateSSIDinSTA") {
+        updateSSIDinSTA = true;
+        strlcpy(SSID_IN_Client, data["SSID_IN_Client"] | "", 32);
+        strlcpy(Auth_IN_Client, data["Auth_IN_Client"] | "", 63);
+        NVS.putString("SSID_IN_Client", SSID_IN_Client);
+        NVS.putString("Auth_IN_Client", Auth_IN_Client);
+
+        sprintf(message, "SSIDinSTA Update sucess");
     } else {
         Serial.println("/wifi accsessd");
-        String str;
         ignoreJustReset = true;
+    }
 
+    String str;
+    if (!update) {
         str = NVS.getString("ssid", "base_iot");
         str.toCharArray(ssid, str.length() + 1);
         str = NVS.getString("wifiPassword", "");
         str.toCharArray(wifiPassword, str.length() + 1);
-        str = NVS.getString("device_mode", "AP");
-        str.toCharArray(device_mode, str.length() + 1);
+    }
+
+    if (!updateDHCP) {
         str = NVS.getString("dhcpMode", "DHCP");
         str.toCharArray(dhcp, str.length() + 1);
+    }
+
+    if (!updateStaticIP) {
         ip1 = NVS.getUChar("ip1", 0);
         ip2 = NVS.getUChar("ip2", 0);
         ip3 = NVS.getUChar("ip3", 0);
@@ -174,11 +198,20 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         dg2 = NVS.getUChar("dg2", 0);
         dg3 = NVS.getUChar("dg3", 0);
         dg4 = NVS.getUChar("dg4", 0);
+    }
+
+    if (!updateDeviceMode) {
+        str = NVS.getString("device_mode", "AP");
+        str.toCharArray(device_mode, str.length() + 1);
+    }
+
+    if (!updateSSIDinSTA) {
         str = NVS.getString("SSID_IN_Client", "");
         str.toCharArray(SSID_IN_Client, str.length() + 1);
         str = NVS.getString("Auth_IN_Client", "");
         str.toCharArray(Auth_IN_Client, str.length() + 1);
     }
+
     if (!ignoreJustReset) {
         if (NVS.getBool("justReset", true))
             NVS.putBool("justReset", false);
