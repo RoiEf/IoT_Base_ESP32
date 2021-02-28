@@ -10,6 +10,9 @@
 #include <esp_int_wdt.h>        //  Watch dog timers. used for hard resetting
 #include <esp_task_wdt.h>       //  Watch dog timers. used for hard resetting
 
+// Temprature sensor
+#include <IoT_Base_Temp_Handlers.h>
+
 // TIMER
 #include <dwd.hpp>
 
@@ -216,6 +219,8 @@ void setup() {
         [](AsyncWebServerRequest *request) {},
         [](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data,
            size_t len, bool final) { handleDoUpdate(request, filename, index, data, len, final); });
+
+    server.on("/temprature", tempratureHandler);
 
     server.onNotFound(handleRoot);
 
