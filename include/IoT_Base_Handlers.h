@@ -13,26 +13,6 @@
 extern String webPassword;
 extern Preferences NVS;
 
-char message[32] = {0};
-char ssid[64] = {0};
-char wifiPassword[64] = {0};
-char device_mode[32] = {0};
-char dhcp[16] = {0};
-int ip1 = 0;
-int ip2 = 0;
-int ip3 = 0;
-int ip4 = 0;
-int sm1 = 0;
-int sm2 = 0;
-int sm3 = 0;
-int sm4 = 0;
-int dg1 = 0;
-int dg2 = 0;
-int dg3 = 0;
-int dg4 = 0;
-char SSID_IN_Client[64] = {0};
-char Auth_IN_Client[64] = {0};
-
 void handleRoot(AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", htmlData);
 }
@@ -92,7 +72,25 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     bool ignoreJustReset = false;
 
     StaticJsonDocument<1024> doc;
-    // JsonObject jObj = doc.as<JsonObject>();
+    char message[32] = {0};
+    char ssid[64] = {0};
+    char wifiPassword[64] = {0};
+    char device_mode[32] = {0};
+    char dhcp[16] = {0};
+    int ip1 = 0;
+    int ip2 = 0;
+    int ip3 = 0;
+    int ip4 = 0;
+    int sm1 = 0;
+    int sm2 = 0;
+    int sm3 = 0;
+    int sm4 = 0;
+    int dg1 = 0;
+    int dg2 = 0;
+    int dg3 = 0;
+    int dg4 = 0;
+    char SSID_IN_Client[64] = {0};
+    char Auth_IN_Client[64] = {0};
 
     if (json.is<JsonArray>()) {
         data = json.as<JsonArray>();
@@ -220,6 +218,7 @@ AsyncCallbackJsonWebHandler *scanWifiHandler = new AsyncCallbackJsonWebHandler("
     StaticJsonDocument<200> data;
     StaticJsonDocument<1024> doc;
     String response;
+    char message[32] = {0};
 
     if (json.is<JsonArray>()) {
         data = json.as<JsonArray>();
