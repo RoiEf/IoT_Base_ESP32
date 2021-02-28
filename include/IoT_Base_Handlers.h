@@ -73,24 +73,24 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
 
     StaticJsonDocument<1024> doc;
     char message[32] = {0};
-    char ssid[64] = {0};
-    char wifiPassword[64] = {0};
-    char device_mode[32] = {0};
-    char dhcp[16] = {0};
-    int ip1 = 0;
-    int ip2 = 0;
-    int ip3 = 0;
-    int ip4 = 0;
-    int sm1 = 0;
-    int sm2 = 0;
-    int sm3 = 0;
-    int sm4 = 0;
-    int dg1 = 0;
-    int dg2 = 0;
-    int dg3 = 0;
-    int dg4 = 0;
-    char SSID_IN_Client[64] = {0};
-    char Auth_IN_Client[64] = {0};
+    char ssid[32] = {0};
+    char wifiPassword[63] = {0};
+    char device_mode[5] = {0};
+    char dhcp[7] = {0};
+    unsigned char ip1 = 0;
+    unsigned char ip2 = 0;
+    unsigned char ip3 = 0;
+    unsigned char ip4 = 0;
+    unsigned char sm1 = 0;
+    unsigned char sm2 = 0;
+    unsigned char sm3 = 0;
+    unsigned char sm4 = 0;
+    unsigned char dg1 = 0;
+    unsigned char dg2 = 0;
+    unsigned char dg3 = 0;
+    unsigned char dg4 = 0;
+    char SSID_IN_Client[32] = {0};
+    char Auth_IN_Client[63] = {0};
 
     if (json.is<JsonArray>()) {
         data = json.as<JsonArray>();
@@ -100,8 +100,8 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
 
     NVS.begin(NVS_STRING, false);
     if (data["cmd"] == "update") {
-        strlcpy(ssid, data["ssid"] | "iot_base", 64);
-        strlcpy(wifiPassword, data["wifiPassword"] | "", 64);
+        strlcpy(ssid, data["ssid"] | "iot_base", 32);
+        strlcpy(wifiPassword, data["wifiPassword"] | "", 63);
         NVS.putString("ssid", ssid);
         NVS.putString("wifiPassword", wifiPassword);
 
@@ -114,18 +114,18 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         NVS.putString("dhcpMode", dhcp);
 
     } else if (data["cmd"] == "updateStaticIP") {
-        NVS.putUInt("ip1", data["ip1"].as<int>());
-        NVS.putUInt("ip2", data["ip2"].as<int>());
-        NVS.putUInt("ip3", data["ip3"].as<int>());
-        NVS.putUInt("ip4", data["ip4"].as<int>());
-        NVS.putUInt("sm1", data["sm1"].as<int>());
-        NVS.putUInt("sm2", data["sm2"].as<int>());
-        NVS.putUInt("sm3", data["sm3"].as<int>());
-        NVS.putUInt("sm4", data["sm4"].as<int>());
-        NVS.putUInt("dg1", data["dg1"].as<int>());
-        NVS.putUInt("dg2", data["dg2"].as<int>());
-        NVS.putUInt("dg3", data["dg3"].as<int>());
-        NVS.putUInt("dg4", data["dg4"].as<int>());
+        NVS.putUChar("ip1", data["ip1"].as<unsigned char>());
+        NVS.putUChar("ip2", data["ip2"].as<unsigned char>());
+        NVS.putUChar("ip3", data["ip3"].as<unsigned char>());
+        NVS.putUChar("ip4", data["ip4"].as<unsigned char>());
+        NVS.putUChar("sm1", data["sm1"].as<unsigned char>());
+        NVS.putUChar("sm2", data["sm2"].as<unsigned char>());
+        NVS.putUChar("sm3", data["sm3"].as<unsigned char>());
+        NVS.putUChar("sm4", data["sm4"].as<unsigned char>());
+        NVS.putUChar("dg1", data["dg1"].as<unsigned char>());
+        NVS.putUChar("dg2", data["dg2"].as<unsigned char>());
+        NVS.putUChar("dg3", data["dg3"].as<unsigned char>());
+        NVS.putUChar("dg4", data["dg4"].as<unsigned char>());
         ip1 = data["ip1"];
         ip2 = data["ip2"];
         ip3 = data["ip3"];
@@ -162,18 +162,18 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         str.toCharArray(device_mode, str.length() + 1);
         str = NVS.getString("dhcpMode", "DHCP");
         str.toCharArray(dhcp, str.length() + 1);
-        ip1 = NVS.getInt("ip1", 0);
-        ip2 = NVS.getInt("ip2", 0);
-        ip3 = NVS.getInt("ip3", 0);
-        ip4 = NVS.getInt("ip4", 0);
-        sm1 = NVS.getInt("sm1", 0);
-        sm2 = NVS.getInt("sm2", 0);
-        sm3 = NVS.getInt("sm3", 0);
-        sm4 = NVS.getInt("sm4", 0);
-        dg1 = NVS.getInt("dg1", 0);
-        dg2 = NVS.getInt("dg2", 0);
-        dg3 = NVS.getInt("dg3", 0);
-        dg4 = NVS.getInt("dg4", 0);
+        ip1 = NVS.getUChar("ip1", 0);
+        ip2 = NVS.getUChar("ip2", 0);
+        ip3 = NVS.getUChar("ip3", 0);
+        ip4 = NVS.getUChar("ip4", 0);
+        sm1 = NVS.getUChar("sm1", 0);
+        sm2 = NVS.getUChar("sm2", 0);
+        sm3 = NVS.getUChar("sm3", 0);
+        sm4 = NVS.getUChar("sm4", 0);
+        dg1 = NVS.getUChar("dg1", 0);
+        dg2 = NVS.getUChar("dg2", 0);
+        dg3 = NVS.getUChar("dg3", 0);
+        dg4 = NVS.getUChar("dg4", 0);
         str = NVS.getString("SSID_IN_Client", "");
         str.toCharArray(SSID_IN_Client, str.length() + 1);
         str = NVS.getString("Auth_IN_Client", "");
@@ -230,6 +230,8 @@ AsyncCallbackJsonWebHandler *scanWifiHandler = new AsyncCallbackJsonWebHandler("
 
         // WiFi.scanNetworks will return the number of networks found
         int n = WiFi.scanNetworks();
+        if (n > 15) n = 15;
+
         Serial.println("scan done");
         if (n == 0) {
             sprintf(message, "no networks found");
