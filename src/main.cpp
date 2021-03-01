@@ -236,6 +236,8 @@ void setup() {
 
     // Start any sensor
     sensors1.begin();
+    sensors1.getAddress(Thermometer, 0);
+    Serial.print("Thermometer address: ");
     delay(2000);
 }
 

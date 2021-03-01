@@ -17,16 +17,14 @@
 // Temp one wire stuff
 OneWire TempSensors(TEMP_SENSE);           // creating oneWire bus object on pin oneWirePin
 DallasTemperature sensors1(&TempSensors);  // initialising temp sensors on the oneWire bus object
-// bool TempSensorFlag = false;
-// #define ACT_TEMP_SENS 2
-// float sensorTemps[ACT_TEMP_SENS];
-// TIMER tempTimer(5000);
+DeviceAddress Thermometer;
+
 void tempratureHandler(AsyncWebServerRequest *request) {
     String response = "{\"temprature\":";
     float currentTemp;
 
     sensors1.requestTemperatures();
-    currentTemp = sensors1.getTempCByIndex(0);
+    currentTemp = sensors1.getTempC(Thermometer);  // getTempCByIndex(0);
     // currentTemp = round(currentTemp * 10.0) / 10.0;
     response += currentTemp;
     response += "}";
