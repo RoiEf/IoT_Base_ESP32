@@ -168,8 +168,8 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         updateSSIDinSTA = true;
         strlcpy(SSID_IN_Client, data["SSID_IN_Client"] | "", 32);
         strlcpy(Auth_IN_Client, data["Auth_IN_Client"] | "", 63);
-        NVS.putString("SSID_IN_Client", SSID_IN_Client);
-        NVS.putString("Auth_IN_Client", Auth_IN_Client);
+        NVS.putString("STA_SSID", SSID_IN_Client);
+        NVS.putString("STA_password", Auth_IN_Client);
 
         sprintf(message, "SSIDinSTA Update sucess");
     } else {
@@ -216,9 +216,9 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     }
 
     if (!updateSSIDinSTA) {
-        str = NVS.getString("SSID_IN_Client", "");
+        str = NVS.getString("STA_SSID", "");
         str.toCharArray(SSID_IN_Client, str.length() + 1);
-        str = NVS.getString("Auth_IN_Client", "");
+        str = NVS.getString("STA_password", "");
         str.toCharArray(Auth_IN_Client, str.length() + 1);
     }
 
