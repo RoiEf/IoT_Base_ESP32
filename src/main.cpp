@@ -62,7 +62,6 @@ void blink(uint8_t times, unsigned long speed, uint8_t pin);
 void toReset(void);
 void hard_restart(void);
 
-int scanWifi(String *str);
 void connTreadFunc(void *pvParameters);
 
 // size_t content_len;
@@ -114,31 +113,7 @@ void setup() {
             // Serial.println(local_ip);
             ip_convert temp;
             temp.ip.decimal = NVS.getUInt("AP_local_ip", 3232235777);  //  192.168.1.1
-            // Serial.println("temp.decimal: ");
-            // Serial.println(temp.ip.decimal);
-
-            // Serial.println("temp.1: ");
-            // Serial.println(temp.ip.octecs[0]);
-            // Serial.println("temp.2: ");
-            // Serial.println(temp.ip.octecs[1]);
-            // Serial.println("temp.3: ");
-            // Serial.println(temp.ip.octecs[2]);
-            // Serial.println("temp.4: ");
-            // Serial.println(temp.ip.octecs[3]);
-
             temp.reverse();
-
-            // Serial.println("temp.decimal: ");
-            // Serial.println(temp.ip.decimal);
-            // Serial.println("temp.1: ");
-            // Serial.println(temp.ip.octecs[0]);
-            // Serial.println("temp.2: ");
-            // Serial.println(temp.ip.octecs[1]);
-            // Serial.println("temp.3: ");
-            // Serial.println(temp.ip.octecs[2]);
-            // Serial.println("temp.4: ");
-            // Serial.println(temp.ip.octecs[3]);
-
             local_ip = temp.ip.octecs;
 
             gateway = local_ip;
@@ -236,8 +211,18 @@ void setup() {
 
     // Start any sensor
     sensors1.begin();
-    sensors1.getAddress(Thermometer, 0);
-    Serial.print("Thermometer address: ");
+    delay(500);
+    xTaskCreatePinnedToCore(
+        tempratureTreadFunc, /* Function to implement the task */
+        "tempratureTask",    /* Name of the task */
+        10000,               /* The size of the task stack specified as the number of bytes. Note that this differs from vanilla FreeRTOS. */
+        NULL,                /* Task input parameter */
+        5,                   /* Priority of the task */
+        &tempratureTread,    /* Task handle. */
+        1);                  /* Core where the task should run */
+
+    // sensors1.getAddress(Thermometer, 0);
+    // Serial.print("Thermometer address: ");
     delay(2000);
 }
 
@@ -338,33 +323,6 @@ void hard_restart(void) {
 // }
 // }
 
-int scanWifi(String *str) {
-    Serial.println("scan start");
-
-    // WiFi.scanNetworks will return the number of networks found
-    int n = WiFi.scanNetworks();
-    Serial.println("scan done");
-    if (n == 0) {
-        Serial.println("no networks found");
-        *str = "<li>No Network Detected.</li>";
-    } else {
-        Serial.println(n);
-        Serial.println(" networks found");
-        for (int i = 0; i < n; ++i) {
-            // Print SSID and RSSI for each network found
-            *str += "<li><input type=\"radio\" name=\"netSelect\" id=\"\" value=\"";
-            *str += String(WiFi.SSID(i));
-            *str += "\">";
-            *str += String(WiFi.SSID(i));
-            *str += " | ";
-            *str += String(WiFi.RSSI(i));
-            *str += " | ";
-            *str += String((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "&#x26BF;");
-            *str += "</li>";
-        }
-    }
-    return n;
-}
 void connTreadFunc(void *pvParameters) {
     const TickType_t xDelay = 1000 / portTICK_PERIOD_MS;
     connTaskFinish = 0;
