@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
 #include <IoT_Base_defaults.h>
+#include <IoT_Types.h>
 #include <Preferences.h>  // flash memory
 #include <Update.h>       // OTA Update
 #include <html.h>
@@ -70,6 +71,7 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     StaticJsonDocument<200> data;
     String response;
     bool ignoreJustReset = false;
+    MODE cbMode;
 
     StaticJsonDocument<1024> doc;
     char message[32] = {0};
@@ -153,10 +155,13 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         updateDeviceMode = true;
         if (data["wifiAP"]) {
             strlcpy(device_mode, data["device_mode"] | "AP", 5);
+            cbMode = AP;
         } else {
             strlcpy(device_mode, data["device_mode"] | "STA", 5);
+            cbMode = DEVICE;
         }
-        NVS.putString("device_mode", device_mode);
+        NVS.putUChar("mode", cbMode);
+        // NVS.putString("mode", device_mode);
         sprintf(message, "Device Mode Update sucess");
 
     } else if (data["cmd"] == "updateSSIDinSTA") {
@@ -201,8 +206,13 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     }
 
     if (!updateDeviceMode) {
-        str = NVS.getString("device_mode", "AP");
-        str.toCharArray(device_mode, str.length() + 1);
+        cbMode = (MODE)NVS.getUChar("mode", MODE::AP);
+        if (cbMode == AP)
+            strlcpy(device_mode, "AP", 5);
+        else
+            strlcpy(device_mode, "STA", 5);
+        // str = NVS.getString("mode", "AP");
+        // str.toCharArray(device_mode, str.length() + 1);
     }
 
     if (!updateSSIDinSTA) {

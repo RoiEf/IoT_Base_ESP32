@@ -90,8 +90,8 @@ void setup() {
 
     Serial.print("justReset: ");
     Serial.println(justReset);
-    Serial.print("mode: ");
-    Serial.println(mode);
+    // Serial.print("mode: ");
+    // Serial.println(mode);
 
     if (mode == RESET && !justReset) {
         NVS.clear();
@@ -103,6 +103,13 @@ void setup() {
 
     if (!justReset) {
         mode = (MODE)NVS.getUChar("mode", MODE::AP);
+        Serial.print("mode: ");
+        if (mode == AP) {
+            Serial.println("AP");
+        } else {
+            Serial.println("STA");
+        }
+
         webPassword = NVS.getString("webPassword", "12345");
 
         Serial.print("webPassword: ");
@@ -117,7 +124,7 @@ void setup() {
             local_ip = temp.ip.octecs;
 
             gateway = local_ip;
-            Serial.println("AP_local_ip: ");
+            Serial.print("AP_local_ip: ");
             Serial.println(local_ip);
 
             temp.ip.decimal = NVS.getUInt("AP_subnet", 4294967040);  //  255.255.255.0
