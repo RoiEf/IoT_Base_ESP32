@@ -181,6 +181,8 @@ void setup() {
             &connTask,     /* Task handle. */
             1);            /* Core where the task should run */
 
+        digitalWrite(MODE_PIN, LOW);
+
         // WiFi.mode(WIFI_STA);
         // if STA_Static -> WiFi.config(local_ip, gateway, subnet);
         // WiFi.begin(wifi_ssid, wifi_password);
