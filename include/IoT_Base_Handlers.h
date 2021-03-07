@@ -79,6 +79,7 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     char wifiPassword[63] = {0};
     char device_mode[5] = {0};
     char dhcp[7] = {0};
+    bool bDhcp = false;
     unsigned char ip1 = 0;
     unsigned char ip2 = 0;
     unsigned char ip3 = 0;
@@ -118,10 +119,12 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         updateDHCP = true;
         if (data["dhcp"]) {
             strlcpy(dhcp, data["dhcpMode"] | "DHCP", 16);
+            NVS.putBool("STA_Static", false);
         } else {
             strlcpy(dhcp, data["dhcpMode"] | "STATIC", 16);
+            NVS.putBool("STA_Static", true);
         }
-        NVS.putString("dhcpMode", dhcp);
+        // NVS.putString("dhcpMode", dhcp);
 
     } else if (data["cmd"] == "updateStaticIP") {
         updateStaticIP = true;
@@ -186,8 +189,15 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     }
 
     if (!updateDHCP) {
-        str = NVS.getString("dhcpMode", "DHCP");
-        str.toCharArray(dhcp, str.length() + 1);
+        bDhcp = NVS.getBool("STA_Static", false);
+        if (bDhcp) {
+            strlcpy(dhcp, "STATIC", 7);
+        } else {
+            strlcpy(dhcp, "DHCP", 7);
+        }
+
+        // str = NVS.getString("dhcpMode", "DHCP");
+        // str.toCharArray(dhcp, str.length() + 1);
     }
 
     if (!updateStaticIP) {
