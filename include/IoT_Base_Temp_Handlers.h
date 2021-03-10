@@ -46,7 +46,7 @@ void tempratureHandler(AsyncWebServerRequest *request) {
 void tempratureTreadFunc(void *pvParameters) {
     const TickType_t xDelay = 100 / portTICK_PERIOD_MS;
     float readTemptature = 444;
-    TIMER tempThreadTimer(15000);
+    TIMER tempThreadTimer(10000);
 
     tempThreadTimer.resetTimer();
     while (tempratureTreadFlag) {

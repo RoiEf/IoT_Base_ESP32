@@ -68,7 +68,7 @@ AsyncCallbackJsonWebHandler *adminHandler = new AsyncCallbackJsonWebHandler("/up
 });
 
 AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wifi", [](AsyncWebServerRequest *request, JsonVariant &json) {
-    StaticJsonDocument<200> data;
+    StaticJsonDocument<250> data;
     String response;
     bool ignoreJustReset = false;
     MODE cbMode;
@@ -83,18 +83,6 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     ip_convert STA_local_ip;
     ip_convert STA_gateway;
     ip_convert STA_subnet;
-    // unsigned char ip1 = 0;
-    // unsigned char ip2 = 0;
-    // unsigned char ip3 = 0;
-    // unsigned char ip4 = 0;
-    // unsigned char sm1 = 0;
-    // unsigned char sm2 = 0;
-    // unsigned char sm3 = 0;
-    // unsigned char sm4 = 0;
-    // unsigned char dg1 = 0;
-    // unsigned char dg2 = 0;
-    // unsigned char dg3 = 0;
-    // unsigned char dg4 = 0;
     char SSID_IN_Client[32] = {0};
     char Auth_IN_Client[63] = {0};
 
@@ -109,6 +97,11 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     } else if (json.is<JsonObject>()) {
         data = json.as<JsonObject>();
     }
+
+    // Serial.print("JsonData: ");
+    // String dataStr;
+    // serializeJson(data, dataStr);
+    // Serial.println(dataStr);
 
     NVS.begin(NVS_STRING, false);
     if (data["cmd"] == "update") {
@@ -132,42 +125,18 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     } else if (data["cmd"] == "updateStaticIP") {
         updateStaticIP = true;
 
-        // NVS.putUChar("ip1", data["ip1"].as<unsigned char>());
-        // NVS.putUChar("ip2", data["ip2"].as<unsigned char>());
-        // NVS.putUChar("ip3", data["ip3"].as<unsigned char>());
-        // NVS.putUChar("ip4", data["ip4"].as<unsigned char>());
-        // NVS.putUChar("sm1", data["sm1"].as<unsigned char>());
-        // NVS.putUChar("sm2", data["sm2"].as<unsigned char>());
-        // NVS.putUChar("sm3", data["sm3"].as<unsigned char>());
-        // NVS.putUChar("sm4", data["sm4"].as<unsigned char>());
-        // NVS.putUChar("dg1", data["dg1"].as<unsigned char>());
-        // NVS.putUChar("dg2", data["dg2"].as<unsigned char>());
-        // NVS.putUChar("dg3", data["dg3"].as<unsigned char>());
-        // NVS.putUChar("dg4", data["dg4"].as<unsigned char>());
-        // ip1 = data["ip1"].as<unsigned char>();
-        // ip2 = data["ip2"].as<unsigned char>();
-        // ip3 = data["ip3"].as<unsigned char>();
-        // ip4 = data["ip4"].as<unsigned char>();
-        // sm1 = data["sm1"].as<unsigned char>();
-        // sm2 = data["sm2"].as<unsigned char>();
-        // sm3 = data["sm3"].as<unsigned char>();
-        // sm4 = data["sm4"].as<unsigned char>();
-        // dg1 = data["dg1"].as<unsigned char>();
-        // dg2 = data["dg2"].as<unsigned char>();
-        // dg3 = data["dg3"].as<unsigned char>();
-        // dg4 = data["dg4"].as<unsigned char>();
-        STA_local_ip.ip.octecs[0] = data["ip1"].as<unsigned char>();
-        STA_local_ip.ip.octecs[1] = data["ip2"].as<unsigned char>();
-        STA_local_ip.ip.octecs[2] = data["ip3"].as<unsigned char>();
-        STA_local_ip.ip.octecs[3] = data["ip4"].as<unsigned char>();
-        STA_subnet.ip.octecs[0] = data["sm1"].as<unsigned char>();
-        STA_subnet.ip.octecs[1] = data["sm2"].as<unsigned char>();
-        STA_subnet.ip.octecs[2] = data["sm3"].as<unsigned char>();
-        STA_subnet.ip.octecs[3] = data["sm4"].as<unsigned char>();
-        STA_gateway.ip.octecs[0] = data["dg1"].as<unsigned char>();
-        STA_gateway.ip.octecs[1] = data["dg2"].as<unsigned char>();
-        STA_gateway.ip.octecs[2] = data["dg3"].as<unsigned char>();
-        STA_gateway.ip.octecs[3] = data["dg4"].as<unsigned char>();
+        STA_local_ip.ip.octecs[0] = data["ip4"].as<unsigned char>();
+        STA_local_ip.ip.octecs[1] = data["ip3"].as<unsigned char>();
+        STA_local_ip.ip.octecs[2] = data["ip2"].as<unsigned char>();
+        STA_local_ip.ip.octecs[3] = data["ip1"].as<unsigned char>();
+        STA_subnet.ip.octecs[0] = data["sm4"].as<unsigned char>();
+        STA_subnet.ip.octecs[1] = data["sm3"].as<unsigned char>();
+        STA_subnet.ip.octecs[2] = data["sm2"].as<unsigned char>();
+        STA_subnet.ip.octecs[3] = data["sm1"].as<unsigned char>();
+        STA_gateway.ip.octecs[0] = data["dg4"].as<unsigned char>();
+        STA_gateway.ip.octecs[1] = data["dg3"].as<unsigned char>();
+        STA_gateway.ip.octecs[2] = data["dg2"].as<unsigned char>();
+        STA_gateway.ip.octecs[3] = data["dg1"].as<unsigned char>();
         NVS.putUInt("STA_local_ip", STA_local_ip.ip.decimal);
         NVS.putUInt("STA_subnet", STA_subnet.ip.decimal);
         NVS.putUInt("STA_gateway", STA_gateway.ip.decimal);
@@ -213,24 +182,9 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
         } else {
             strlcpy(dhcp, "DHCP", 7);
         }
-
-        // str = NVS.getString("dhcpMode", "DHCP");
-        // str.toCharArray(dhcp, str.length() + 1);
     }
 
     if (!updateStaticIP) {
-        // ip1 = NVS.getUChar("ip1", 0);
-        // ip2 = NVS.getUChar("ip2", 0);
-        // ip3 = NVS.getUChar("ip3", 0);
-        // ip4 = NVS.getUChar("ip4", 0);
-        // sm1 = NVS.getUChar("sm1", 0);
-        // sm2 = NVS.getUChar("sm2", 0);
-        // sm3 = NVS.getUChar("sm3", 0);
-        // sm4 = NVS.getUChar("sm4", 0);
-        // dg1 = NVS.getUChar("dg1", 0);
-        // dg2 = NVS.getUChar("dg2", 0);
-        // dg3 = NVS.getUChar("dg3", 0);
-        // dg4 = NVS.getUChar("dg4", 0);
         STA_local_ip.ip.decimal = NVS.getUInt("STA_local_ip", 3232235777);
         STA_subnet.ip.decimal = NVS.getUInt("STA_subnet", 4294967040);
         STA_gateway.ip.decimal = NVS.getUInt("STA_gateway", 3232235777);
@@ -242,8 +196,6 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
             strlcpy(device_mode, "AP", 5);
         else
             strlcpy(device_mode, "STA", 5);
-        // str = NVS.getString("mode", "AP");
-        // str.toCharArray(device_mode, str.length() + 1);
     }
 
     if (!updateSSIDinSTA) {
@@ -267,18 +219,18 @@ AsyncCallbackJsonWebHandler *wifiHandler = new AsyncCallbackJsonWebHandler("/wif
     doc["wifiPassword"] = wifiPassword;
     doc["device_mode"] = device_mode;
     doc["dhcp"] = dhcp;
-    doc["ip1"] = STA_local_ip.ip.octecs[0];
-    doc["ip2"] = STA_local_ip.ip.octecs[1];
-    doc["ip3"] = STA_local_ip.ip.octecs[2];
-    doc["ip4"] = STA_local_ip.ip.octecs[3];
-    doc["sm1"] = STA_subnet.ip.octecs[0];
-    doc["sm2"] = STA_subnet.ip.octecs[1];
-    doc["sm3"] = STA_subnet.ip.octecs[2];
-    doc["sm4"] = STA_subnet.ip.octecs[3];
-    doc["dg1"] = STA_gateway.ip.octecs[0];
-    doc["dg2"] = STA_gateway.ip.octecs[1];
-    doc["dg3"] = STA_gateway.ip.octecs[2];
-    doc["dg4"] = STA_gateway.ip.octecs[3];
+    doc["ip1"] = STA_local_ip.ip.octecs[3];
+    doc["ip2"] = STA_local_ip.ip.octecs[2];
+    doc["ip3"] = STA_local_ip.ip.octecs[1];
+    doc["ip4"] = STA_local_ip.ip.octecs[0];
+    doc["sm1"] = STA_subnet.ip.octecs[3];
+    doc["sm2"] = STA_subnet.ip.octecs[2];
+    doc["sm3"] = STA_subnet.ip.octecs[1];
+    doc["sm4"] = STA_subnet.ip.octecs[0];
+    doc["dg1"] = STA_gateway.ip.octecs[3];
+    doc["dg2"] = STA_gateway.ip.octecs[2];
+    doc["dg3"] = STA_gateway.ip.octecs[1];
+    doc["dg4"] = STA_gateway.ip.octecs[0];
     doc["SSID_IN_Client"] = SSID_IN_Client;
     doc["Auth_IN_Client"] = Auth_IN_Client;
 

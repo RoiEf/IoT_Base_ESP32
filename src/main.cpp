@@ -153,9 +153,25 @@ void setup() {
 
             STA_Static = NVS.getBool("STA_Static", false);
             if (STA_Static) {
-                local_ip = NVS.getUInt("STA_local_ip", 3232235777);  //  192.168.1.1
-                gateway = NVS.getUInt("STA_gateway", 3232235777);    //  192.168.1.1
-                subnet = NVS.getUInt("STA_subnet", 4294967040);      //  255.255.255.0
+                ip_convert temp;
+
+                temp.ip.decimal = NVS.getUInt("STA_local_ip", 3232235777);  //  192.168.1.1
+                temp.reverse();
+                local_ip = temp.ip.octecs;
+                temp.ip.decimal = NVS.getUInt("STA_gateway", 3232235777);  //  192.168.1.1
+                temp.reverse();
+                gateway = temp.ip.octecs;
+                temp.ip.decimal = NVS.getUInt("STA_subnet", 4294967040);  //  255.255.255.0
+                temp.reverse();
+                subnet = temp.ip.octecs;
+
+                Serial.println("STA_Static: true");
+                Serial.print("STA_local_ip: ");
+                Serial.println(local_ip);
+                Serial.print("STA_gateway: ");
+                Serial.println(gateway);
+                Serial.print("STA_subnet: ");
+                Serial.println(subnet);
             }
         }
     }
@@ -232,7 +248,7 @@ void setup() {
 
     // sensors1.getAddress(Thermometer, 0);
     // Serial.print("Thermometer address: ");
-    delay(2000);
+    delay(1000);
 }
 
 void loop() {
@@ -339,6 +355,9 @@ void connTreadFunc(void *pvParameters) {
     static int i = 0;
     // #endif
     WiFi.mode(WIFI_STA);
+    if (STA_Static) {
+        WiFi.config(local_ip, gateway, subnet);
+    }
     WiFi.begin(wifi_ssid, wifi_password);  // Connect to the network
     Serial.println("Wifi.begine Connecting to: ");
     Serial.println(wifi_ssid);
